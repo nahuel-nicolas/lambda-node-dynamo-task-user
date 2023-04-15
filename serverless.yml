@@ -13,8 +13,8 @@ provider:
         - arn:aws:dynamodb:us-east-1:139785125919:table/TaskTable
 
 functions:
-  api:
-    handler: index.handler
+  hello:
+    handler: src/hello.hello
     events:
       - httpApi:
           path: /
