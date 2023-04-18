@@ -15,7 +15,7 @@ provider:
 
 plugins:
   - serverless-ignore
-
+  - serverless-offline
 functions:
   hello:
     handler: src/hello.hello
