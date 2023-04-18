@@ -13,6 +13,9 @@ provider:
         - arn:aws:dynamodb:us-east-1:139785125919:table/TaskTable
         - arn:aws:dynamodb:us-east-1:139785125919:table/UserTable
 
+plugins:
+  - serverless-ignore
+
 functions:
   hello:
     handler: src/hello.hello
