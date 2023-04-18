@@ -11,6 +11,7 @@ provider:
         - dynamodb:*
       Resource:
         - arn:aws:dynamodb:us-east-1:139785125919:table/TaskTable
+        - arn:aws:dynamodb:us-east-1:139785125919:table/UserTable
 
 functions:
   hello:
@@ -49,6 +50,36 @@ functions:
       - httpApi:
           path: /tasks/{id}
           method: delete
+  addUser:
+    handler: src/user.addUser
+    events:
+      - httpApi:
+          path: /users
+          method: post
+  getUsers:
+    handler: src/user.getUsers
+    events:
+      - httpApi:
+          path: /users
+          method: get
+  getUser:
+    handler: src/user.getUser
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: get
+  updateUser:
+    handler: src/user.updateUser
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: put
+  deleteUser:
+    handler: src/user.deleteUser
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: delete
 
 resources:
   Resources:
@@ -56,6 +87,17 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: TaskTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UserTable
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id
