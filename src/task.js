@@ -1,11 +1,20 @@
 const { v4 } = require("uuid");
-const AWS = require("aws-sdk");
+const {
+    DynamoDBDocument
+    } = require("@aws-sdk/lib-dynamodb"),
+    {
+    DynamoDB
+    } = require("@aws-sdk/client-dynamodb");
 const middy = require("@middy/core");
 const httpJSONBodyParser = require("@middy/http-json-body-parser");
 
 
 const addTask = async (event) => {
-  const dynamodb = new AWS.DynamoDB.DocumentClient();
+  const dynamodb = DynamoDBDocument.from(new DynamoDB(), {
+    marshallOptions: {
+        removeUndefinedValues: true
+    }
+  });
 
   const { title, description, userId } = event.body;
   const createdAt = (new Date()).toISOString();
@@ -28,8 +37,7 @@ const addTask = async (event) => {
     .put({
       TableName: "TaskTable",
       Item: newTask,
-    })
-    .promise();
+    });
 
   return {
     statusCode: 200,
@@ -38,9 +46,9 @@ const addTask = async (event) => {
 };
 
 const getTasks = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
   
-    const result = await dynamodb.scan({ TableName: "TaskTable" }).promise();
+    const result = await dynamodb.scan({ TableName: "TaskTable" });
   
     const tasks = result.Items;
   
@@ -53,7 +61,7 @@ const getTasks = async (event) => {
 };
 
 const getTask = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
   
     const { id } = event.pathParameters;
   
@@ -61,8 +69,7 @@ const getTask = async (event) => {
       .get({
         TableName: "TaskTable",
         Key: { id },
-      })
-      .promise();
+      });
     const task = taskResult.Item;
   
     if (task.userId) {
@@ -71,8 +78,7 @@ const getTask = async (event) => {
           .get({
             TableName: "UserTable",
             Key: { id: task.userId },
-          })
-          .promise();
+          });
         const user = userResult.Item;
         delete task.userId
         task.user = user;
@@ -88,7 +94,7 @@ const getTask = async (event) => {
 };
 
 const updateTask = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
     const { id } = event.pathParameters;
   
     const { title, description, userId, done } = JSON.parse(event.body);
@@ -107,8 +113,7 @@ const updateTask = async (event) => {
           ":done": done,
         },
         ReturnValues: "ALL_NEW",
-      })
-      .promise();
+      });
   
     return {
       statusCode: 200,
@@ -119,7 +124,7 @@ const updateTask = async (event) => {
 };
 
 const deleteTask = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
     const { id } = event.pathParameters;
   
     await dynamodb
@@ -128,8 +133,7 @@ const deleteTask = async (event) => {
         Key: {
           id,
         },
-      })
-      .promise();
+      });
   
     return {
       status: 200,

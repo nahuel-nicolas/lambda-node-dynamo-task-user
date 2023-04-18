@@ -1,11 +1,20 @@
 const { v4 } = require("uuid");
-const AWS = require("aws-sdk");
+const {
+        DynamoDBDocument
+      } = require("@aws-sdk/lib-dynamodb"),
+      {
+        DynamoDB
+      } = require("@aws-sdk/client-dynamodb");
 const middy = require("@middy/core");
 const httpJSONBodyParser = require("@middy/http-json-body-parser");
 
 
 const addUser = async (event) => {
-  const dynamodb = new AWS.DynamoDB.DocumentClient();
+  const dynamodb = DynamoDBDocument.from(new DynamoDB(), {
+    marshallOptions: {
+        removeUndefinedValues: true
+    }
+  });
 
   const { username, password } = event.body;
   const createdAt = (new Date()).toISOString();
@@ -26,8 +35,7 @@ const addUser = async (event) => {
     .put({
       TableName: "UserTable",
       Item: newUser,
-    })
-    .promise();
+    });
 
   return {
     statusCode: 200,
@@ -36,9 +44,9 @@ const addUser = async (event) => {
 };
 
 const getUsers = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
   
-    const result = await dynamodb.scan({ TableName: "UserTable" }).promise();
+    const result = await dynamodb.scan({ TableName: "UserTable" });
   
     const users = result.Items;
   
@@ -51,7 +59,7 @@ const getUsers = async (event) => {
 };
 
 const getUser = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
   
     const { id } = event.pathParameters;
   
@@ -59,8 +67,7 @@ const getUser = async (event) => {
       .get({
         TableName: "UserTable",
         Key: { id },
-      })
-      .promise();
+      });
   
     const user = result.Item;
   
@@ -71,7 +78,7 @@ const getUser = async (event) => {
 };
 
 const updateUser = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
     const { id } = event.pathParameters;
   
     const { username, password, done } = JSON.parse(event.body);
@@ -88,8 +95,7 @@ const updateUser = async (event) => {
           ":updatedAt": updatedAt,
         },
         ReturnValues: "ALL_NEW",
-      })
-      .promise();
+      });
   
     return {
       statusCode: 200,
@@ -100,7 +106,7 @@ const updateUser = async (event) => {
   };
 
 const deleteUser = async (event) => {
-    const dynamodb = new AWS.DynamoDB.DocumentClient();
+    const dynamodb = DynamoDBDocument.from(new DynamoDB());
     const { id } = event.pathParameters;
   
     await dynamodb
@@ -109,8 +115,7 @@ const deleteUser = async (event) => {
         Key: {
           id,
         },
-      })
-      .promise();
+      });
   
     return {
       status: 200,
