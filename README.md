@@ -1,3 +1,30 @@
+config tables arn on serverless.iamRoleStatements.Resource
+
+# sls deploy #
+
+## images: ##
+
+# After deploy console log #
+![user](images/user.png)
+
+# Created tables #
+![user2](images/user2.png)
+
+# TaskTable arn #
+![TaskTableArn](images/TaskTableArn.png)
+
+# Add Task #
+![addTask](images/addTask.png)
+
+# Get Tasks #
+![getTasks](images/getTasks.png)
+
+# Debugging errors #
+![updateTaskError2](images/updateTaskError2.png)
+
+# getTask task.user #
+![getUserWithUserID](images/getUserWithUserID.png)
+
 <!--
 title: 'AWS Simple HTTP Endpoint example in NodeJS'
 description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
